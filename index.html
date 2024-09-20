@@ -1,0 +1,99 @@
+import React, { useState, useEffect } from 'react';
+
+const CosineSimilarityDiagram = () => {
+  const [queryAngle, setQueryAngle] = useState(45);
+  const [similarAngle, setSimilarAngle] = useState(30);
+  const [dissimilarAngle, setDissimilarAngle] = useState(120);
+
+  const calculateCosineSimilarity = (angle1, angle2) => {
+    const radianDiff = Math.abs(angle1 - angle2) * (Math.PI / 180);
+    return Math.cos(radianDiff).toFixed(3);
+  };
+
+  const [similaritySimilar, setSimilaritySimilar] = useState(calculateCosineSimilarity(queryAngle, similarAngle));
+  const [similarityDissimilar, setSimilarityDissimilar] = useState(calculateCosineSimilarity(queryAngle, dissimilarAngle));
+
+  useEffect(() => {
+    setSimilaritySimilar(calculateCosineSimilarity(queryAngle, similarAngle));
+    setSimilarityDissimilar(calculateCosineSimilarity(queryAngle, dissimilarAngle));
+  }, [queryAngle, similarAngle, dissimilarAngle]);
+
+  const polarToCartesian = (angle, radius) => {
+    const radians = (angle - 90) * (Math.PI / 180);
+    return {
+      x: 200 + radius * Math.cos(radians),
+      y: 200 + radius * Math.sin(radians)
+    };
+  };
+
+  const queryVector = polarToCartesian(queryAngle, 150);
+  const similarVector = polarToCartesian(similarAngle, 130);
+  const dissimilarVector = polarToCartesian(dissimilarAngle, 130);
+
+  return (
+    <div className="flex flex-col items-center p-4 bg-gray-100 rounded-lg">
+      <svg width="400" height="400" viewBox="0 0 400 400">
+        {/* Coordinate system */}
+        <line x1="50" y1="350" x2="350" y2="350" stroke="black" strokeWidth="2" />
+        <line x1="200" y1="350" x2="200" y2="50" stroke="black" strokeWidth="2" />
+        
+        {/* Axis labels */}
+        <text x="360" y="355" fontSize="14">X</text>
+        <text x="190" y="40" fontSize="14">Y</text>
+        
+        {/* Vectors */}
+        <line x1="200" y1="200" x2={queryVector.x} y2={queryVector.y} stroke="blue" strokeWidth="2" />
+        <line x1="200" y1="200" x2={similarVector.x} y2={similarVector.y} stroke="green" strokeWidth="2" />
+        <line x1="200" y1="200" x2={dissimilarVector.x} y2={dissimilarVector.y} stroke="red" strokeWidth="2" />
+        
+        {/* Labels */}
+        <text x={queryVector.x + 10} y={queryVector.y} fill="blue" fontSize="14">Query</text>
+        <text x={similarVector.x + 10} y={similarVector.y} fill="green" fontSize="14">Similar</text>
+        <text x={dissimilarVector.x + 10} y={dissimilarVector.y} fill="red" fontSize="14">Dissimilar</text>
+      </svg>
+      
+      <div className="mt-4 space-y-2">
+        <div>
+          <label className="mr-2">Query Angle:</label>
+          <input 
+            type="range" 
+            min="0" 
+            max="360" 
+            value={queryAngle} 
+            onChange={(e) => setQueryAngle(Number(e.target.value))}
+          />
+          <span className="ml-2">{queryAngle}°</span>
+        </div>
+        <div>
+          <label className="mr-2">Similar Angle:</label>
+          <input 
+            type="range" 
+            min="0" 
+            max="360" 
+            value={similarAngle} 
+            onChange={(e) => setSimilarAngle(Number(e.target.value))}
+          />
+          <span className="ml-2">{similarAngle}°</span>
+        </div>
+        <div>
+          <label className="mr-2">Dissimilar Angle:</label>
+          <input 
+            type="range" 
+            min="0" 
+            max="360" 
+            value={dissimilarAngle} 
+            onChange={(e) => setDissimilarAngle(Number(e.target.value))}
+          />
+          <span className="ml-2">{dissimilarAngle}°</span>
+        </div>
+      </div>
+      
+      <div className="mt-4 text-center">
+        <p>Cosine Similarity (Query to Similar): {similaritySimilar}</p>
+        <p>Cosine Similarity (Query to Dissimilar): {similarityDissimilar}</p>
+      </div>
+    </div>
+  );
+};
+
+export default CosineSimilarityDiagram;
